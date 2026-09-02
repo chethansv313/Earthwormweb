@@ -2,13 +2,13 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Install dependencies if requirements.txt exists
-COPY requirements.txt ./
-RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi
-
-# Copy all application files
+# Copy all project files into the container
 COPY . .
 
-# Run the Flask app on the Cloud Run PORT
+# Install dependencies if requirements.txt exists, otherwise install basic web dependencies
+RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; else pip install --no-cache-dir flask; fi
+
+# Default Cloud Run environment port
 ENV PORT=8080
+
 CMD ["python", "app.py"]
