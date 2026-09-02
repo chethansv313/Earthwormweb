@@ -1,34 +1,40 @@
 FROM python:3.10-slim
 
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
-# Install system dependencies for OpenCV and scraping
+# System dependencies for OpenCV, GrabCut, and web scraping
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
     libgl1 \
     libglib2.0-0 \
     libgomp1 \
+    libsm6 \
+    libxext6 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy project files
 COPY . .
 
-# Install all required Python packages
-RUN pip install --no-cache-dir \
+# Install all Python libraries required by app.py
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
     gunicorn \
     flask \
-    requests \
-    cloudscraper \
-    beautifulsoup4 \
-    lxml \
+    flask-login \
+    flask-sqlalchemy \
+    werkzeug \
     opencv-python-headless \
     numpy \
     pandas \
+    cloudscraper \
+    beautifulsoup4 \
+    lxml \
     pillow \
-    scipy \
-    scikit-learn
-
-# Install extra packages if requirements.txt exists
-RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi
+    scikit-learn \
+    tensorflow-cpu
 
 ENV PORT=8080
 
